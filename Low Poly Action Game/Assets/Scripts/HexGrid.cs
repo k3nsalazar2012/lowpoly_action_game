@@ -7,16 +7,23 @@ public class HexGrid : MonoBehaviour
     [SerializeField] private Color defaultColor = Color.white, touchedColor = Color.magenta;
     [SerializeField] private HexCell cellPrefab;
     [SerializeField] private Text cellLabelPrefab;
-    
+    [SerializeField] private Texture2D noiseSource;
+
     private HexCell[] cells;
     private Canvas gridCanvas;
     private HexMesh hexMesh;
 
     private void Awake()
     {
+        HexMetrics.noiseSource = noiseSource;
         gridCanvas = GetComponentInChildren<Canvas>();
         hexMesh = GetComponentInChildren<HexMesh>();
         GenerateGrid();
+    }
+
+    private void OnEnable()
+    {
+        HexMetrics.noiseSource = noiseSource;
     }
 
     private void Start()
@@ -78,12 +85,13 @@ public class HexGrid : MonoBehaviour
             }
         }
 
-        /*Text label = Instantiate<Text>(cellLabelPrefab);
+        Text label = Instantiate<Text>(cellLabelPrefab);
         label.rectTransform.SetParent(gridCanvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
         label.text = cell.coordinates.ToStringOnSeparateLine();
 
-        cell.uiRect = label.rectTransform;*/
+        cell.uiRect = label.rectTransform;
+        cell.Elevation = 0;
     }
 
     public HexCell GetCell(Vector3 position)
