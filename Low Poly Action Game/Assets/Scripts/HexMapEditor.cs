@@ -9,11 +9,9 @@ public class HexMapEditor : MonoBehaviour
 
     private Color activeColor;
     private int activeElevation;
-
-    private void Awake()
-    {
-        SelectColor(0);
-    }
+    private bool applyColor;
+    private bool applyElevation = true;
+    private int brushSize;
 
     private void Update()
     {
@@ -29,24 +27,65 @@ public class HexMapEditor : MonoBehaviour
 
         if (Physics.Raycast(inputRay, out RaycastHit hit))
         {
-            EditCell(hexGrid.GetCell(hit.point));
+            EditCells(hexGrid.GetCell(hit.point));
         }
     }
 
     private void EditCell(HexCell cell)
     {
-        cell.color = activeColor;
-        cell.Elevation = activeElevation;
-        hexGrid.Refresh();
+        if (cell)
+        {
+            if (applyColor)
+                cell.Color = activeColor;
+
+            if (applyElevation)
+                cell.Elevation = activeElevation;
+        }
     }
 
     public void SelectColor(int index)
     {
-        activeColor = colors[index];
+        applyColor = index >= 0;
+
+        if (applyColor)
+            activeColor = colors[index];
     }
 
     public void SetElevation(float elevation)
     {
         activeElevation = (int)elevation;
+    }
+
+    public void SetApplyElevation(bool toogle)
+    {
+        applyElevation = toogle;
+    }
+
+    public void SetBrushSize(float size)
+    {
+        brushSize = (int) size;
+    }
+
+    private void EditCells(HexCell center)
+    {
+        int centerX = center.coordinates.X;
+        int centerZ = center.coordinates.Z;
+
+        for(int r=0, z = centerZ - brushSize; z <= centerZ; z++, r++)
+        {
+            for (int x = centerX - r; x <= centerX + brushSize; x++)
+                EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+        }
+
+        for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++)
+        {
+            for (int x = centerX - brushSize; x <= centerX + r; x++)
+                EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+        }
+    }
+
+    public void ShowUI(bool visible)
+    {
+        hexGrid.ShowUI(visible);
     }
 }
