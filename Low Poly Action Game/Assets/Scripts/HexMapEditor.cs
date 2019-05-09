@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class HexMapEditor : MonoBehaviour
@@ -7,6 +8,7 @@ public class HexMapEditor : MonoBehaviour
     [SerializeField] private HexGrid hexGrid;
 
     private Color activeColor;
+    private int activeElevation;
 
     private void Awake()
     {
@@ -27,12 +29,24 @@ public class HexMapEditor : MonoBehaviour
 
         if (Physics.Raycast(inputRay, out RaycastHit hit))
         {
-            hexGrid.ColorCell(hit.point, activeColor);
+            EditCell(hexGrid.GetCell(hit.point));
         }
+    }
+
+    private void EditCell(HexCell cell)
+    {
+        cell.color = activeColor;
+        cell.Elevation = activeElevation;
+        hexGrid.Refresh();
     }
 
     public void SelectColor(int index)
     {
         activeColor = colors[index];
+    }
+
+    public void SetElevation(float elevation)
+    {
+        activeElevation = (int)elevation;
     }
 }
